@@ -1,5 +1,5 @@
 import psycopg2
-import database
+import database, psi
 
 if __name__ == '__main__':
     conn = database.connect()
