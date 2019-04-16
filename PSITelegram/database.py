@@ -30,7 +30,10 @@ def storePSI(response):
         cur.execute("SELECT * FROM psi_readings;")
         row = cur.fetchone()
         old_status = row[5]
-        # if old_status != status , tele alert
+
+        if old_status != status:
+            initiatePanic()
+
         cur.execute('DELETE FROM psi_readings;', (None,))
         cur.execute(sql,data)
         conn.commit()
@@ -53,7 +56,9 @@ def storeUser(userid,region):
         
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
+        sql = "UPDATE tele_subs SET region = %s WHERE id = %s;"
+        cur.execute(sql, (region,userid))
+        conn.commit()
     finally:
         if conn is not None:
             conn.close()
@@ -70,3 +75,6 @@ def removeUser(userid):
     finally:
         if conn is not None:
             conn.close()
+
+def initiatePanic():
+    

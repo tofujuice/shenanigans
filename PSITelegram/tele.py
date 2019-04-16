@@ -19,4 +19,7 @@ def handle(msg):
         database.storeUser(userid,region)
         bot.sendMessage(userid,"Alert activated!")
 
+def psi_alert():
+    
+
 MessageLoop(bot,handle).run_forever()
