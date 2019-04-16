@@ -33,7 +33,6 @@ def storePSI(response):
         cur.execute("SELECT * FROM psi_readings;")
         row = cur.fetchone()
         old_status = row[5]
-        print(old_status)
         # if old_status != status , tele alert
         cur.execute('DELETE FROM psi_readings;', (None,))
         cur.execute(sql,data)
