@@ -56,9 +56,7 @@ def storeUser(userid,region):
         
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
-        sql = "UPDATE tele_subs SET region = %s WHERE id = %s;"
-        cur.execute(sql, (region,userid))
-        conn.commit()
+        print(error)
     finally:
         if conn is not None:
             conn.close()
@@ -76,5 +74,5 @@ def removeUser(userid):
         if conn is not None:
             conn.close()
 
-def initiatePanic():
+# def initiatePanic():
     
