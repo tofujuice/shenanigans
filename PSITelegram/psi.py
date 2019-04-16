@@ -10,40 +10,4 @@ def getPSI():
     params = {'date_time':time_now}
     response = requests.get(url,params=params)
     response = response.json()
-    storePSI(response)
-
-def storePSI(response):
-    psi_24 = response['items'][0]['readings']['psi_twenty_four_hourly']
-    north = int(psi_24['north'])
-    south = int(psi_24['south'])
-    east = int(psi_24['east'])
-    west =  int(psi_24['west'])
-    central = int(psi_24['central'])
-    update_timestamp = response['items'][0]['update_timestamp']
-    update_timestamp = update_timestamp[0:-6]
-    update_timestamp  = datetime.strptime(update_timestamp, '%Y-%m-%dT%H:%M:%S')
-    status = str(response['api_info']['status'])
-    
-    sql = "INSERT INTO psi_readings (north24, south24, east24, west24, central24, status, lastupdated) VALUES(%s,%s,%s,%s,%s,%s,%s)"
-    data = (north,south,east,west,central,status,update_timestamp)
-
-    try:
-        conn = database.connect()
-        cur = conn.cursor()
-        cur.execute("SELECT * FROM psi_readings;")
-        row = cur.fetchone()
-        old_status = row[5]
-        # if old_status != status , tele alert
-        cur.execute('DELETE FROM psi_readings;', (None,))
-        cur.execute(sql,data)
-        conn.commit()
-        
-        cur.close()
-    except (Exception, psycopg2.DatabaseError) as error:
-        print(error)
-    finally:
-        if conn is not None:
-            conn.close()
-
-
-getPSI()
+    database.storePSI(response)
