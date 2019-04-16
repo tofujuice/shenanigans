@@ -41,3 +41,32 @@ def storePSI(response):
     finally:
         if conn is not None:
             conn.close()
+
+def storeUser(userid,region):
+    sql = "INSERT INTO tele_subs (id,region) VALUES(%s,%s)"
+    data = (userid,region)
+    try:
+        conn = connect()
+        cur = conn.cursor()
+        cur.execute(sql,data)
+        conn.commit()
+        
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
+
+def removeUser(userid):
+    try:
+        conn = connect()
+        cur = conn.cursor()
+        cur.execute('DELETE FROM tele_subs where id= %s;', (userid,))
+        conn.commit()
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close()
