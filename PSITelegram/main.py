@@ -1,5 +1,7 @@
 import psycopg2
-import database, psi
+import database, psi, time
 
 if __name__ == '__main__':
-    getPSI()
+    while True:
+        psi.getPSI()
+        time.sleep(3600)

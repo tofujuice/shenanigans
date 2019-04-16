@@ -1,5 +1,6 @@
 from datetime import datetime
 import requests, json, psycopg2
+import tele
 
 def connect():
     conn = None
@@ -29,15 +30,12 @@ def storePSI(response):
         cur = conn.cursor()
         cur.execute("SELECT * FROM psi_readings;")
         row = cur.fetchone()
-        old_status = row[5]
-
+        old_status = str(row[5])
         if old_status != status:
             initiatePanic()
-
         cur.execute('DELETE FROM psi_readings;', (None,))
         cur.execute(sql,data)
         conn.commit()
-        
         cur.close()
     except (Exception, psycopg2.DatabaseError) as error:
         print(error)
@@ -74,5 +72,27 @@ def removeUser(userid):
         if conn is not None:
             conn.close()
 
-# def initiatePanic():
+def initiatePanic():
+    subs_rows = None
+    reading = None
+
+    try:
+        conn = connect()
+        cur = conn.cursor()
+        cur.execute("SELECT * FROM tele_subs;")
+        subs_rows = cur.fetchall()
+        cur.execute("SELECT * from psi_readings;")
+        reading = cur.fetchone()
+        conn.commit()
+        cur.close()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if conn is not None:
+            conn.close() 
     
+    for r in subs_rows:
+        index = int(r[1]) - 1
+        print(reading)
+        msg = "PSI Status: " + str(reading[5]) + "\nPSI Reading: " + str(reading[index]) + "\n\nLast updated: " + str(reading[6])
+        tele.psi_alert(r[0],msg)
