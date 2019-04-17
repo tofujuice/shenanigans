@@ -17,10 +17,21 @@ def storePSI(response):
     east = int(psi_24['east'])
     west =  int(psi_24['west'])
     central = int(psi_24['central'])
+    national = int(psi_24['national'])
     update_timestamp = response['items'][0]['update_timestamp']
     update_timestamp = update_timestamp[0:-6]
     update_timestamp  = datetime.strptime(update_timestamp, '%Y-%m-%dT%H:%M:%S')
-    status = str(response['api_info']['status'])
+    status = None
+    if national <= 50:
+        status = 'Good'
+    elif national <= 100:
+        status = 'Moderate'
+    elif national <= 200:
+        status = 'Unhealthy'
+    elif national <= 300:
+        status = "Very Unhealthy"
+    else:
+        status = Hazardous
     
     sql = "INSERT INTO psi_readings (north24, south24, east24, west24, central24, status, lastupdated) VALUES(%s,%s,%s,%s,%s,%s,%s)"
     data = (north,south,east,west,central,status,update_timestamp)
@@ -93,6 +104,5 @@ def initiatePanic():
     
     for r in subs_rows:
         index = int(r[1]) - 1
-        print(reading)
         msg = "PSI Status: " + str(reading[5]) + "\nPSI Reading: " + str(reading[index]) + "\n\nLast updated: " + str(reading[6])
         tele.psi_alert(r[0],msg)
